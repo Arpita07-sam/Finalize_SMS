@@ -121,13 +121,14 @@ class SignatureDataset(Dataset):
     def __len__(self):
         return len(self.pairs)
 
-
+print("Started training")
 train_loader = DataLoader(
     SignatureDataset(train_pairs, train_labels),
     batch_size=BATCH_SIZE,
     shuffle=True
 )
 
+print("Started Validation")
 val_loader = DataLoader(
     SignatureDataset(val_pairs, val_labels),
     batch_size=BATCH_SIZE,
