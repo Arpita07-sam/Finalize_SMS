@@ -157,3 +157,62 @@ for epoch in range(EPOCHS):
 
 torch.save(model.state_dict(), "siamese_model.pth")
 print("Model saved.")
+
+# import torch
+# from torch.utils.data import DataLoader
+# from model import SiameseNetwork, ContrastiveLoss
+# from data_utils import prepare_data, generate_pairs, SignatureDataset
+
+# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# BATCH_SIZE = 32
+# EPOCHS = 15
+# LR = 0.0001
+
+
+# def train():
+#     data, train_writers, val_writers, _ = prepare_data()
+
+#     train_pairs, train_labels = generate_pairs(data, train_writers)
+
+#     train_loader = DataLoader(
+#         SignatureDataset(train_pairs, train_labels),
+#         batch_size=BATCH_SIZE,
+#         shuffle=True
+#     )
+
+#     model = SiameseNetwork().to(DEVICE)
+#     criterion = ContrastiveLoss()
+#     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+
+#     print("Using device:", DEVICE)
+
+#     for epoch in range(EPOCHS):
+#         model.train()
+#         total_loss = 0
+
+#         for batch_idx, (img1, img2, label) in enumerate(train_loader):
+#             img1, img2, label = (
+#                 img1.to(DEVICE),
+#                 img2.to(DEVICE),
+#                 label.to(DEVICE)
+#             )
+
+#             optimizer.zero_grad()
+#             out1, out2 = model(img1, img2)
+#             loss = criterion(out1, out2, label)
+#             loss.backward()
+#             optimizer.step()
+
+#             total_loss += loss.item()
+
+#             if batch_idx % 50 == 0:
+#                 print(f"Epoch {epoch+1} Batch {batch_idx}")
+
+#         print(f"Epoch {epoch+1}/{EPOCHS} - Loss: {total_loss:.4f}")
+
+#     torch.save(model.state_dict(), "siamese_model.pth")
+#     print("Model saved.")
+
+
+# if __name__ == "__main__":
+#     train()
