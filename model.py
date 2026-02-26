@@ -1,56 +1,24 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torchvision.models as models
 
 class SiameseNetwork(nn.Module):
     def __init__(self):
         super(SiameseNetwork, self).__init__()
-
-        self.cnn = nn.Sequential(
-            nn.Conv2d(1, 32, 3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(32, 64, 3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(64, 128, 3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
+        
+        self.base_model = models.resnet18(pretrained=True)
+        self.base_model.conv1 = nn.Conv2d(
+            1, 64, kernel_size=7, stride=2, padding=3, bias=False
         )
 
-        self.fc = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(128 * 19 * 27, 256),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(256, 128)
-        )
+        num_features = self.base_model.fc.in_features
+        self.base_model.fc = nn.Linear(num_features, 128)
 
     def forward_once(self, x):
-        x = self.cnn(x)
-        x = self.fc(x)
-        return F.normalize(x, p=2, dim=1)
+        return self.base_model(x)
 
-    def forward(self, x1, x2):
-        return self.forward_once(x1), self.forward_once(x2)
-
-
-class ContrastiveLoss(nn.Module):
-    def __init__(self, margin=1.0):
-        super().__init__()
-        self.margin = margin
-
-    def forward(self, out1, out2, label):
-        distance = F.pairwise_distance(out1, out2)
-        loss = torch.mean(
-            label * torch.pow(distance, 2) +
-            (1 - label) * torch.pow(
-                torch.clamp(self.margin - distance, min=0.0), 2
-            )
-        )
-        return loss
+    def forward(self, anchor, positive, negative):
+        anchor_out = self.forward_once(anchor)
+        positive_out = self.forward_once(positive)
+        negative_out = self.forward_once(negative)
+        return anchor_out, positive_out, negative_out
