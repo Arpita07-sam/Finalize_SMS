@@ -1,5 +1,6 @@
 # train.py
 
+from matplotlib import pyplot as plt
 import torch
 from torch.utils.data import DataLoader
 import torch.optim as optim
@@ -20,14 +21,14 @@ val_writers = [str(i) for i in range(41, 56)]
 # 2️⃣ Create Datasets
 # ----------------------------
 train_dataset = SignatureTripletDataset(
-    genuine_dir="CEDAR/full_org",
-    forged_dir="CEDAR/full_forg",
+    genuine_dir="signatures/full_org",
+    forged_dir="signatures/full_forg",
     writers=train_writers
 )
 
 val_dataset = SignatureTripletDataset(
-    genuine_dir="CEDAR/full_org",
-    forged_dir="CEDAR/full_forg",
+    genuine_dir="signatures/full_org",
+    forged_dir="signatures/full_forg",
     writers=val_writers
 )
 
@@ -39,7 +40,7 @@ val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 # ----------------------------
 model = SiameseNetwork().to(device)
 criterion = torch.nn.TripletMarginLoss(margin=1.0)
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
+optimizer = optim.Adam(model.parameters(), lr=5e-5)
 
 # ----------------------------
 # 4️⃣ Validation Function
@@ -75,11 +76,15 @@ def validate(model, loader):
 # ----------------------------
 # 5️⃣ Training Loop
 # ----------------------------
+
+train_losses = []
+val_losses = []
+
 best_val_loss = float("inf")
-patience = 5
+patience = 10
 counter = 0
 
-for epoch in range(30):
+for epoch in range(50):
 
     model.train()
     train_loss = 0
@@ -93,9 +98,21 @@ for epoch in range(30):
         optimizer.zero_grad()
 
         a, p, n = model(anchor, positive, negative)
+        d_pos = F.pairwise_distance(a, p)
+        d_neg = F.pairwise_distance(a, n)
+
+        # Semi-hard filtering
+        mask = d_neg < (d_pos + 1.0)
+
+        if mask.sum() > 0:
+            loss = criterion(a[mask], p[mask], n[mask])
+        else:
+            continue
         loss = criterion(a, p, n)
         loss.backward()
         optimizer.step()
+
+        print("Hard samples:", mask.sum().item())
 
         train_loss += loss.item()
 
@@ -109,6 +126,9 @@ for epoch in range(30):
     print(f"Val Accuracy: {val_acc:.4f}")
     print("-"*40)
 
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
+
     # Early Stopping
     if val_loss < best_val_loss:
         best_val_loss = val_loss
@@ -120,3 +140,13 @@ for epoch in range(30):
     if counter >= patience:
         print("Early stopping triggered.")
         break
+
+    plt.figure()
+    plt.plot(train_losses,label="Train Loss")
+    plt.plot(val_losses,label="Validation Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training Curve")
+    plt.legend()
+    plt.grid()
+    plt.show()
