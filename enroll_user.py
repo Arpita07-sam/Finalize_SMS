@@ -69,7 +69,7 @@ def get_embeddings(path, augment_times=5):
 
 
 
-user_name = "staff2"
+user_name = "staff4"
 save_dir = f"office_database/{user_name}"
 os.makedirs(save_dir, exist_ok=True)
 
