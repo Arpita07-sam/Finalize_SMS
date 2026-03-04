@@ -1,141 +1,38 @@
-# import cv2
-# import numpy as np
-# import os
-
-# # 1. Load Image
-# img = cv2.imread(r"signatures\location\loc1.jpeg")
-# if img is None:
-#     print("Image not found")
-#     exit()
-
-# # 2. Fix Lighting (CLAHE)
-# # This makes the green ink more distinct from the shadows on the paper
-# hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-# h, s, v = cv2.split(hsv)
-# clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-# v = clahe.apply(v)
-# hsv = cv2.merge([h, s, v])
-
-# # 3. Detect Green Ink (Widened Range)
-# lower_green = np.array([35, 40, 40]) 
-# upper_green = np.array([95, 255, 255])
-# mask = cv2.inRange(hsv, lower_green, upper_green)
-
-# # 4. Bridge the Gaps (Crucial for Photographs)
-# # We use a larger kernel to join the individual pen strokes into one "blob"
-# kernel = np.ones((15, 15), np.uint8) 
-# mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-# mask = cv2.dilate(mask, kernel, iterations=1)
-
-# # 5. Find Contours and Crop
-# contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-# if contours:
-#     # Find the largest green area (the signature)
-#     largest_cnt = max(contours, key=cv2.contourArea)
-#     x, y, w, h = cv2.boundingRect(largest_cnt)
-
-#     # Add a little padding so the crop isn't too tight
-#     pad = 20
-#     # Ensure padding doesn't go outside image boundaries
-#     crop_img = img[max(0, y-pad):min(img.shape[0], y+h+pad), 
-#                    max(0, x-pad):min(img.shape[1], x+w+pad)]
-    
-#         # 1. Convert the cropped image to HSV
-#     crop_hsv = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
-
-#     # 2. Define the green range (same as before)
-#     lower_green = np.array([35, 40, 40])
-#     upper_green = np.array([95, 255, 255])
-
-#     # 3. Create a mask of ONLY the green signature
-#     sig_mask = cv2.inRange(crop_hsv, lower_green, upper_green)
-
-#     # 4. Clean up the mask (remove noise, bridge small gaps in pen ink)
-#     kernel = np.ones((3,3), np.uint8)
-#     sig_mask = cv2.morphologyEx(sig_mask, cv2.MORPH_CLOSE, kernel)
-
-#     # 5. Create a pure white background of the same size
-#     white_bg = np.full(crop_img.shape, 255, dtype=np.uint8)
-
-#     # 6. Copy only the green parts from the original crop onto the white background
-#     # Where the mask is 255 (green found), use original pixels. Else, keep white.
-#     final_signature = np.where(sig_mask[:, :, None] == 255, crop_img, white_bg)
-
-#     # Save the cleaned signature
-#     cv2.imwrite("only_signature.jpg", final_signature)
-
-#     cv2.imshow("Cleaned Signature", final_signature)
-#     cv2.waitKey(0)
-
-#     # # 6. Save the Result
-#     # save_path = "extracted_signature.jpg"
-#     # cv2.imwrite(save_path, crop_img)
-#     # print(f"Success! Signature saved as {save_path}")
-
-#     # # Show the crop for verification
-#     # cv2.imshow("Cropped Signature", crop_img)
-#     # cv2.waitKey(0)
-# else:
-#     print("No signature detected. Check your HSV ranges.")
-
-# cv2.destroyAllWindows()
-
-
-
-
 import cv2
 import numpy as np
-import os
 
-# 1. Load Image
-img = cv2.imread(r"signatures\location\loc6.jpeg")
-if img is None:
-    print("Image not found")
-    exit()
+def forensic_green_extraction(image_path):
+    # 1. Load the image
+    img = cv2.imread(image_path)
+    # Convert to float32 for high-precision math
+    data = img.astype(np.float32) / 255.0
+    
+    # 2. Focus on the 'Green Dominance'
+    # In RGB, black text has R≈G≈B. Green ink has G > R and G > B.
+    # We create a 'Pure Green' score for every pixel
+    b, g, r = cv2.split(data)
+    
+    # Calculate how much "greener" a pixel is compared to the other channels
+    # This specifically targets the green ink signature
+    green_score = g - (r * 0.5 + b * 0.5)
+    
+    # 3. Enhance the contrast of the signature
+    green_score = np.clip(green_score, 0, 1)
+    green_score = (green_score * 255).astype(np.uint8)
+    
+    # 4. Use Otsu's Binarization to find the signature automatically
+    _, mask = cv2.threshold(green_score, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    # 5. Noise Removal (Removes tiny speckles from the paper texture)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
-# 2. Fix Lighting (CLAHE)
-# This makes the green ink more distinct from the shadows on the paper
-hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-h, s, v = cv2.split(hsv)
-clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-v = clahe.apply(v)
-hsv = cv2.merge([h, s, v])
+    # 6. Apply to original image to get the color signature back
+    # This keeps the green ink texture while making everything else transparent
+    result = cv2.merge([img[:,:,0], img[:,:,1], img[:,:,2], mask])
+    
+    return result
 
-# 3. Detect Green Ink (Widened Range)
-lower_green = np.array([35, 40, 40]) 
-upper_green = np.array([95, 255, 255])
-mask = cv2.inRange(hsv, lower_green, upper_green)
-
-# 4. Bridge the Gaps (Crucial for Photographs)
-# We use a larger kernel to join the individual pen strokes into one "blob"
-kernel = np.ones((15, 15), np.uint8) 
-mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-mask = cv2.dilate(mask, kernel, iterations=1)
-
-# 5. Find Contours and Crop
-contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-if contours:
-    # Find the largest green area (the signature)
-    largest_cnt = max(contours, key=cv2.contourArea)
-    x, y, w, h = cv2.boundingRect(largest_cnt)
-
-    # Add a little padding so the crop isn't too tight
-    pad = 20
-    # Ensure padding doesn't go outside image boundaries
-    crop_img = img[max(0, y-pad):min(img.shape[0], y+h+pad), 
-                   max(0, x-pad):min(img.shape[1], x+w+pad)]
-
-    # 6. Save the Result
-    save_path = "extracted_signature.jpg"
-    cv2.imwrite(save_path, crop_img)
-    print(f"Success! Signature saved as {save_path}")
-
-    # Show the crop for verification
-    cv2.imshow("Cropped Signature", crop_img)
-    cv2.waitKey(0)
-else:
-    print("No signature detected. Check your HSV ranges.")
-
-cv2.destroyAllWindows()
+# Save as PNG to keep transparency
+final_extraction = forensic_green_extraction('extracted_signature.jpg')
+cv2.imwrite('extracted.png', final_extraction)
