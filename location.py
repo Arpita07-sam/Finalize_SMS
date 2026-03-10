@@ -49,8 +49,10 @@ if contours:
 
     # Show the crop for verification
     cv2.imshow("Cropped Signature", crop_img)
+    
     cv2.waitKey(0)
 else:
     print("No signature detected. Check your HSV ranges.")
 
 cv2.destroyAllWindows()
+

@@ -1,141 +1,146 @@
-# import cv2
-# import numpy as np
-
-# # Load image
-# img = cv2.imread("extracted_signature.jpg")
-
-# if img is None:
-#     print("Image not found")
-#     exit()
-
-# # Convert to HSV
-# hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-# # Green ink range
-# lower_green = np.array([30, 20, 20])
-# upper_green = np.array([100, 255, 255])
-
-# mask = cv2.inRange(hsv, lower_green, upper_green)
-
-# # Clean noise
-# kernel = np.ones((3,3), np.uint8)
-
-# mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=2)
-# mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
-# mask = cv2.dilate(mask, kernel, iterations=1)
-# # kernel = np.ones((3,3), np.uint8)
-# # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
-# # mask = cv2.dilate(mask, kernel, iterations=2)
-
-# # Extract only signature strokes
-# signature = cv2.bitwise_and(img, img, mask=mask)
-
-# # Convert to grayscale
-# gray = cv2.cvtColor(signature, cv2.COLOR_BGR2GRAY)
-
-# # Threshold to isolate strokes
-# _, thresh = cv2.threshold(gray, 10, 255, cv2.THRESH_BINARY)
-
-# # Find contours
-# contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-# x_min, y_min = 9999, 9999
-# x_max, y_max = 0, 0
-
-# for c in contours:
-#     area = cv2.contourArea(c)
-#     if area > 400:
-#         x,y,w,h = cv2.boundingRect(c)
-
-#         x_min = min(x_min, x)
-#         y_min = min(y_min, y)
-#         x_max = max(x_max, x+w)
-#         y_max = max(y_max, y+h)
-
-# pad = 10
-
-# x_min = max(0, x_min-pad)
-# y_min = max(0, y_min-pad)
-# x_max = min(img.shape[1], x_max+pad)
-# y_max = min(img.shape[0], y_max+pad)
-
-# clean = signature[y_min:y_max, x_min:x_max]
-
-# clean = cv2.resize(clean,(224,224))
-
-# clean = cv2.cvtColor(clean, cv2.COLOR_BGR2GRAY)
-
-# _, clean = cv2.threshold(clean, 10, 255, cv2.THRESH_BINARY_INV)
-
-# cv2.imwrite("clean_signature.jpg", clean)
-
-# print("Signature cleaned and saved")
-
-# cv2.imshow("Mask", mask)
-# cv2.imshow("Signature", clean)
-
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-
-
-# import cv2
-# import numpy as np
-
-# def clean_signature(img):  # img is numpy array from cv2.imread
-#     if img is None:
-#         raise ValueError("Input image is None")
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#     denoised = cv2.fastNlMeansDenoising(gray)
-#     blurred = cv2.medianBlur(denoised, 3)
-#     binary = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-#     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
-#     cleaned = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
-#     return cleaned
-
-# # Usage
-# cropped_sig = cv2.imread("extracted_signature.jpg")
-# cleaned = clean_signature(cropped_sig)
-# cv2.imwrite("cleaned_signature.jpg", cleaned)
-# print("Cleaned signature saved!")
-
-
 import cv2
 import numpy as np
+import sys
+from pathlib import Path
 
-def clean_signature_with_line_removal(img):
+def extract_green_signature(image_path: str, output_path: str = None, debug: bool = True):
+    """
+    Extracts green ink signature from a timetable with overlapping printed black text.
+    Uses LAB color space 'a' channel — the most reliable method for green ink isolation.
+
+    Args:
+        image_path  : Path to the input timetable image
+        output_path : Where to save the extracted signature (optional)
+        debug       : If True, saves intermediate steps for inspection
+
+    Returns:
+        signature_clean : The extracted signature as a binary mask (numpy array)
+    """
+
+    # ── 1. LOAD IMAGE ──────────────────────────────────────────────────────────
+    img = cv2.imread(image_path)
     if img is None:
-        raise ValueError("Input image is None")
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    denoised = cv2.fastNlMeansDenoising(gray)
-    blurred = cv2.medianBlur(denoised, 3)
-    binary = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)  # INV for black sig on white
-    
-    # Detect edges for Hough lines
-    edges = cv2.Canny(binary, 50, 150)
-    
-    # HoughLinesP for horizontal lines: short length, high threshold for straight lines
-    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=50, minLineLength=50, maxLineGap=10)
-    line_mask = np.zeros(binary.shape, dtype=np.uint8)
-    
-    if lines is not None:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            if abs(y1 - y2) < 10:  # Horizontal-ish lines only
-                cv2.line(line_mask, (x1, y1), (x2, y2), 255, 5)  # Thicken to cover line
-    
-    # Inpaint lines (TELEA fast)
-    inpainted = cv2.inpaint(binary, line_mask, 3, cv2.INPAINT_TELEA)
-    
-    # Final morphology
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
-    cleaned = cv2.morphologyEx(inpainted, cv2.MORPH_OPEN, kernel)  # Open to disconnect
-    
-    return cleaned
+        raise FileNotFoundError(f"Could not load image: {image_path}")
 
-# Usage
-cropped_sig = cv2.imread("extracted_signature.jpg")
-cleaned = clean_signature_with_line_removal(cropped_sig)
-cv2.imwrite("signature_no_line.jpg", cleaned)
-cv2.imshow("Cleaned", cleaned)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    original = img.copy()
+    print(f"[✓] Loaded image: {img.shape[1]}x{img.shape[0]} px")
+
+    # ── 2. CONVERT TO LAB COLOR SPACE ─────────────────────────────────────────
+    # LAB separates color from lightness. 'a' channel = green(-) vs red(+)
+    # Black printed text → 'a' ≈ 128 (neutral)
+    # Green ink signature → 'a' << 128 (strongly green = lower values)
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    L, a, b = cv2.split(lab)
+
+    print(f"[✓] LAB conversion done | 'a' channel min={a.min()}, max={a.max()}, mean={a.mean():.1f}")
+
+    # ── 3. ISOLATE GREEN FROM 'a' CHANNEL ─────────────────────────────────────
+    # In OpenCV, LAB 'a' is stored as 0–255 (128 = neutral)
+    # Green pixels → values BELOW 128 (typically 90–120 range)
+    # Black text   → values NEAR 128
+    # White paper  → values NEAR 128
+
+    # Invert: green becomes bright white, everything else dark
+    a_inverted = 255 - a
+
+    # Threshold: keep only distinctly green pixels
+    # Adjust threshold (135–160) if your green is darker/lighter
+    _, green_mask = cv2.threshold(a_inverted, 135, 255, cv2.THRESH_BINARY)
+
+    # Alternative: use Otsu auto-thresholding (uncomment if above doesn't work)
+    # _, green_mask = cv2.threshold(a_inverted, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    print(f"[✓] Green mask: {np.count_nonzero(green_mask)} green pixels found")
+
+    # ── 4. MORPHOLOGICAL CLEANUP ───────────────────────────────────────────────
+    # Remove tiny noise dots (salt/pepper from scanning)
+    kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    cleaned = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel_open, iterations=1)
+
+    # Close small gaps within signature strokes
+    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    cleaned = cv2.morphologyEx(cleaned, cv2.MORPH_CLOSE, kernel_close, iterations=2)
+
+    # ── 5. REMOVE SMALL BLOBS (stray noise/dots) ──────────────────────────────
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(cleaned)
+    min_blob_area = 50  # pixels — tune this if strokes are thin
+    final_mask = np.zeros_like(cleaned)
+
+    kept = 0
+    for i in range(1, num_labels):
+        if stats[i, cv2.CC_STAT_AREA] >= min_blob_area:
+            final_mask[labels == i] = 255
+            kept += 1
+
+    print(f"[✓] Kept {kept} signature components after noise removal")
+
+    # ── 6. CREATE CLEAN WHITE-BACKGROUND OUTPUT ────────────────────────────────
+    # Signature strokes = black, background = white (standard for verification)
+    signature_on_white = np.full_like(cv2.cvtColor(original, cv2.COLOR_BGR2GRAY), 255)
+    signature_on_white[final_mask == 255] = 0
+
+    # ── 7. CROP TO SIGNATURE BOUNDING BOX ─────────────────────────────────────
+    coords = cv2.findNonZero(final_mask)
+    if coords is not None:
+        x, y, w, h = cv2.boundingRect(coords)
+        padding = 20
+        x1 = max(0, x - padding)
+        y1 = max(0, y - padding)
+        x2 = min(img.shape[1], x + w + padding)
+        y2 = min(img.shape[0], y + h + padding)
+        cropped_signature = signature_on_white[y1:y2, x1:x2]
+        print(f"[✓] Signature cropped to: {w}x{h} px (with {padding}px padding)")
+    else:
+        cropped_signature = signature_on_white
+        print("[!] Warning: No signature pixels found — check your green threshold")
+
+    # ── 8. SAVE OUTPUTS ────────────────────────────────────────────────────────
+    base = Path(image_path).stem
+    out_dir = Path(output_path).parent if output_path else Path(image_path).parent
+
+    # Main output: clean cropped signature
+    final_out = output_path or str(out_dir / f"{base}_signature_extracted.png")
+    cv2.imwrite(final_out, cropped_signature)
+    print(f"[✓] Saved extracted signature → {final_out}")
+
+    if debug:
+        # Save intermediate steps to understand what's happening
+        cv2.imwrite(str(out_dir / f"{base}_debug_a_channel.png"), a)
+        cv2.imwrite(str(out_dir / f"{base}_debug_a_inverted.png"), a_inverted)
+        cv2.imwrite(str(out_dir / f"{base}_debug_green_mask_raw.png"), green_mask)
+        cv2.imwrite(str(out_dir / f"{base}_debug_mask_final.png"), final_mask)
+        print(f"[✓] Debug images saved to: {out_dir}")
+
+    return cropped_signature, final_mask
+
+
+# ── OVERLAY VISUALIZATION ──────────────────────────────────────────────────────
+def visualize_overlay(image_path: str, mask: np.ndarray):
+    """Shows original image with signature highlighted in red for verification."""
+    img = cv2.imread(image_path)
+    overlay = img.copy()
+    overlay[mask == 255] = [0, 0, 255]  # highlight signature in red
+    result = cv2.addWeighted(img, 0.5, overlay, 0.5, 0)
+    out_path = str(Path(image_path).parent / (Path(image_path).stem + "_overlay.png"))
+    cv2.imwrite(out_path, result)
+    print(f"[✓] Overlay visualization saved → {out_path}")
+
+
+# ── MAIN ───────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python clean_sign.py signatures\location\loc5.jpeg final_sign.png")
+        # print("Example: python extract_signature.py timetable.jpg signature_out.png")
+        sys.exit(1)
+
+    image_path = sys.argv[1]
+    output_path = sys.argv[2] if len(sys.argv) > 2 else None
+
+    signature, mask = extract_green_signature(image_path, output_path, debug=True)
+    visualize_overlay(image_path, mask)
+
+    print("\n── DONE ──────────────────────────────────────────────────────────────")
+    print("Check the output files. If signature is incomplete or has noise:")
+    print("  • Lower threshold (e.g. 130) → captures more green pixels")
+    print("  • Raise threshold (e.g. 145) → removes more background noise")
+    print("  • Reduce min_blob_area (e.g. 20) → keeps finer strokes")
