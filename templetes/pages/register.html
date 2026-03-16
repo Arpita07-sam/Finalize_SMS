@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-box">
+        <div class="login-header">
+            <img src="JNTUH_logo.png" alt="College Logo">
+            <h2>Registeration</h2>
+        </div>
+
+        <label>Department</label>
+        <input type="text" placeholder="Enter Department">
+
+        <label>ID number</label>
+        <input type="text" placeholder="Enter Id number">
+
+        <label>Phone number</label>
+        <input type="text" placeholder="ENter phone number">
+
+       
+
+        <button class="opt-btn" onclick="generateOTP()">Generate OTP</button>
+
+        <label>ENter OTP</label>
+        <input type="text" id="otpInput" placeholder="Enter OTP">
+
+        <button onclick="registerUser()">Register</button>
+
+    </div>
+
+<script src="script.js"></script>
+    
+</body>
+</html>
