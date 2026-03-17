@@ -8,48 +8,106 @@
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <nav class="sidebar">
-            <h2>AppLogo</h2>
-            <ul>
-                <li><a href="#" class="active">Dashboard</a></li>
-                
-                <li><a href="#">HOD</a></li>
-                <li><a href="#">Faculty</a></li>
-                <li><a href="#">Database</a></li>
-                <li><a href="#">Payment</a></li>
-                <li><a href="#">History</a></li>
-                <li><a href="#">Settings</a></li>
-            </ul>
-        </nav>
-
-        <main class="main-content">
-            <header>
-                <div class="logo">
-                    <img src="JNTUH_logo.png" alt="College Logo">
+    <!-- <div class="dashboard-container">
+        <div id="content-area">
+            <nav class="sidebar">
+                <h2>AppLogo</h2>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
                     
-                    <h1>JNTUH FACULTY SMS NOTIFICATION SYSTEM</h1>
-                </div>
-                
-            </header>
-            <section class="content-area">
-                <div class="data-table">
-                    <h3 class="page-header">Upload the image here</h3>
+                    <li><a href="#">HOD</a></li>
+                    <li><a href="#" class="faculty-btn" onclick="loadPage('faculty.html')">Faculty</a></li>
+                    <li><a href="#" class="database-btn" onclick="databaseHandle()">Database</a></li>
+                    <li><a href="#" class="payment-btn" onclick="paymentDetails()">Payment</a></li>
+                    <li><a href="#" class="history-btn" onclick="historyDetails()">History</a></li>
+                    <li><a href="#" class="setting-btn" onclick="settingHandle()">Settings</a></li>
+                </ul>
+            </nav>
+        </div> -->
 
-                    <div class="image-uploader-grid">
-                        <div id="image-list" class="image-list-container"></div>
+        <div class="dashboard-container" style="display: flex;">
+            <nav class="sidebar">
+                <h2>AppLogo</h2>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#" onclick="loadPage('hod.html')">HOD</a></li>
+                    <li><a href="#" onclick="loadPage('faculty.html')">Faculty</a></li>
+                    <li><a href="#" onclick="loadPage('payment.html')">Payment</a></li>
+                    <li><a href="#" onclick="loadPage('history.html')">History</a></li>
+                    <li><a href="#" onclick="loadPage('setting.html')">Settings</a></li>
+                </ul>
+            </nav>
 
-                        <label class="add-image-btn">
-                            <span>+</span>
-                            <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
-                        </label>
+            <main class="main-content">
+                <header>
+                    <div class="logo">
+                        <img src="JNTUH_logo.png" alt="College Logo">
+                        
+                        <h1>JNTUH FACULTY SMS NOTIFICATION SYSTEM</h1>
                     </div>
-                    <br>
-                    <p>Your latest project updates will appear here.</p>
+                    
+                </header>
+                <section class="content-area" id="content-area">
+                    <div class="data-table">
+                        <h3 class="page-header">Upload the image here</h3>
+
+                        <div class="image-uploader-grid">
+                            <div id="image-list" class="image-list-container"></div>
+
+                            <label class="add-image-btn">
+                                <span>+</span>
+                                <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
+                            </label>
+                        </div>
+                        <br>
+                        <p>Your latest project updates will appear here.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+<script>
+
+function loadPage(page) {
+
+    const contentArea = document.getElementById("content-area");
+
+    // default dashboard view
+    if (page === "dashboard") {
+        contentArea.innerHTML = `
+            <div class="data-table">
+                <h3 class="page-header">Upload the image here</h3>
+
+                <div class="image-uploader-grid">
+                    <div id="image-list" class="image-list-container"></div>
+
+                    <label class="add-image-btn">
+                        <span>+</span>
+                        <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
+                    </label>
                 </div>
-            </section>
-        </main>
-    </div>
+                <br>
+                <p>Your latest project updates will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // load external html inside dashboard
+    fetch(page)
+        .then(res => res.text())
+        .then(data => {
+            contentArea.innerHTML = data;
+        })
+        .catch(err => {
+            contentArea.innerHTML = "<h2>Page not found</h2>";
+        });
+}
+
+</script>
+<script>
+window.onload = () => loadPage("dashboard");
+</script>
     <script src="script.js"></script>
 
 </body>

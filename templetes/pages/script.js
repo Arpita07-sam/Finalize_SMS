@@ -59,6 +59,43 @@ function togglePassword(){
 }
 
 
+function loadPage(page) {
+
+    const contentArea = document.getElementById("content-area");
+
+    // default dashboard view
+    if (page === "dashboard") {
+        contentArea.innerHTML = `
+            <div class="data-table">
+                <h3 class="page-header">Upload the image here</h3>
+
+                <div class="image-uploader-grid">
+                    <div id="image-list" class="image-list-container"></div>
+
+                    <label class="add-image-btn">
+                        <span>+</span>
+                        <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
+                    </label>
+                </div>
+                <br>
+                <p>Your latest project updates will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // load external html inside dashboard
+    fetch(page)
+        .then(res => res.text())
+        .then(data => {
+            contentArea.innerHTML = data;
+        })
+        .catch(err => {
+            contentArea.innerHTML = "<h2>Page not found</h2>";
+        });
+}
+
+
 /* LIVE PASSWORD CHECK */
 
 function checkPassword(){
@@ -139,6 +176,45 @@ function handleMultipleUpload(event) {
     // Clear input so you can re-upload the same image if needed
     event.target.value = "";
 }
+
+function submitToDB() {
+   // 1. Grab values from the input fields
+   const name = document.getElementById('newName').value;
+   const category = document.getElementById('newCategory').value;
+   const qty = document.getElementById('newQty').value;
+
+   if(!name || !category || !qty) {
+      alert("Please fill in all fields");
+      return;
+   }
+
+   // 2. Logic to send to your database (via Fetch API later)
+   console.log("Sending to DB:", { name, category, qty });
+
+   // For now, let's just clear the inputs
+   document.getElementById('newName').value = '';
+   document.getElementById('newCategory').value = '';
+   document.getElementById('newQty').value = '';
+   
+   alert("Ready to connect to backend!");
+}
+
+function addData() {
+    alert("Add clicked");
+}
+
+function editData() {
+    alert("Edit clicked");
+}
+
+function deleteData() {
+    alert("Delete clicked");
+}
+
+function uploadData() {
+    alert("Upload clicked");
+}
+
 
 
 

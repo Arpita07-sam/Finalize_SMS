@@ -102,30 +102,7 @@ header {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Container for Title + Arrow */
-.category-header {
-    display: flex;
-    justify-content: space-between; /* Pushes title to left, arrow to right */
-    align-items: center;
-    padding: 15px 10px 5px 0;
-    cursor: pointer;
-}
 
-.category-title {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #7f8c8d;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.arrow {
-    font-size: 14px;
-    color: #7f8c8d;
-    transition: transform 0.3s ease; /* Smooth rotation */
-    display: inline-block;
-    font-family: monospace; /* Keeps the '>' looking sharp */
-}
 
 
 
@@ -221,6 +198,37 @@ header {
 
 .image-wrapper:hover .remove-mark {
     opacity: 1;
+}
+
+.content-area {
+    position: relative;
+    padding-bottom: 80px; /* space for buttons */
+}
+
+.bottom-actions {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+/* buttons design */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.add-btn { background: #28a745; color: white; }
+.edit-btn { background: #ffc107; }
+.delete-btn { background: #dc3545; color: white; }
+.upload-btn { background: #007bff; color: white; }
+
+.btn:hover {
+    opacity: 0.9;
 }
 
 
