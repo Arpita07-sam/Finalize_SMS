@@ -50,6 +50,13 @@ body {
     transition: 0.3s;
 }
 
+.sidebar ul li a.active {
+    background-color: hsl(210, 29%, 29%); /* Darker shade */
+    color: #3498db;          
+    font-weight: bold;
+    /* border-left: 4px solid #3498db; */
+}
+
 .sidebar ul li a:hover, .sidebar ul li a.active {
     color: white;
     font-weight: bold;

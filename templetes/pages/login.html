@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='temp_style.css') }}">
 </head>
 <body>
         <div class="login-box">
         <div class="login-header">
-            <img src="JNTUH_logo.png" alt="College Logo">
+            <img src="{{ url_for('static', filename='JNTUH_logo.png') }}" alt="Logo">
             <h2>Login details</h2>
         </div>
 <!-- 
@@ -29,21 +29,21 @@
             <span onclick="togglePassword()" class="show-btn">Show</span>
         </div>
 
-            <!-- RULES -->
+            <!-- RULES
         <div class="password-rules">
             <p id="length">• At least 8 characters</p>
             <p id="upper">• One uppercase letter</p>
             <p id="number">• One number</p>
             <p id="special">• One special character</p>
-        </div>
+        </div> -->
 
-        <button onclick="validatePassword()">Login</button>
+        <button onclick="loginUser()">Login</button>
 
 
 
     </div>
 
-<script src="script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
     
 </body>
 </html>

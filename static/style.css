@@ -1,0 +1,61 @@
+
+.title {
+    text-align: center;
+}
+.logo {
+   position: absolute;
+   left: 170px;
+}
+
+.logo img {
+    height: 88px;
+}
+
+.fakeimg {
+height: 200px;
+background: #aaa;
+}
+
+
+
+.register-btn{
+   background-color: #dd3e22;
+   color: rgb(231, 227, 227);
+   padding: 8px 16px;
+   border-radius: 6px;
+   text-decoration: none;
+   font-weight: bold;
+   transition: 0.3s;
+}
+
+.register-btn:hover{
+   background-color: #ffaa00;
+}
+
+#password-indicators {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.dot {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background-color: #eee; /* Neutral grey */
+    color: #999;
+    border: 1px solid #ddd;
+    transition: 0.3s all ease;
+}
+
+/* When valid, it turns green and bold */
+.dot.valid {
+    background-color: #eafff0;
+    color: #27ae60;
+    border-color: #2ecc71;
+    font-weight: bold;
+}
+
+
+
+

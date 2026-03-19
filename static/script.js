@@ -1,3 +1,13 @@
+
+function registerFunction(){
+   window.location.href = "/register";
+}
+
+function loginFunction() {
+   window.location.href = "/login";
+}
+
+
 /* OTP GENERATE */
 
 let generatedOTP;
@@ -18,27 +28,50 @@ function registerUser(){
    }else{
       alert("Wrong OTP");
    }
-   window.location.href = "login.html";
+   window.location.href = "/dashboard";
 }
 
+function loginUser() {
+    window.location.href = "/dashboard";
+}
 
-function validatePassword(){
+// 1. Create a global variable to track status
+let passwordReady = false;
 
-   let pass = document.getElementById("password").value;
+function validatePassword() {
+    const password = document.getElementById('password').value;
+    const hint = document.getElementById('password-hint');
 
-   let pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    if (password === "") {
+        hint.innerText = "";
+        passwordReady = false;
+        return;
+    }
 
-   if(pattern.test(pass)){
-      alert("Strong password ✅");
-   }else{
-      alert("Password not strong ❌");
-   }
+    // Check conditions
+    if (password.length < 8) {
+        hint.innerText = "● Must be at least 8 characters";
+        passwordReady = false;
+    } else if (!/\d/.test(password)) {
+        hint.innerText = "● Must include at least one number";
+        passwordReady = false;
+    } else if (!/[!@#$%^&*]/.test(password)) {
+        hint.innerText = "● Must include a special character (@, #, $)";
+        passwordReady = false;
+    } else {
+        hint.innerText = "✔ Password looks strong!";
+        hint.style.color = "#2ecc71";
+        passwordReady = true; // Only now is it "Ready"
+    }
 
-      // demo login check
-   alert("Login successful!");
+}
 
-   // go to dashboard
-   window.location.href = "main.html";
+function handleFormSubmit(event) {
+    if (!passwordReady) {
+        event.preventDefault(); // This kills the request before it leaves the browser
+        alert("Password is too weak!");
+        return false;
+    }
 }
 
 
@@ -58,20 +91,26 @@ function togglePassword(){
    }
 }
 
-
-function loadPage(page) {
-
+function loadPage(page, element) { // Added 'element' parameter
     const contentArea = document.getElementById("content-area");
 
-    // default dashboard view
+    // --- HIGHLIGHT LOGIC START ---
+    // 1. Remove 'active' class from all sidebar links
+    const links = document.querySelectorAll('.sidebar ul li a');
+    links.forEach(link => link.classList.remove('active'));
+
+    // 2. Add 'active' class to the clicked element (if provided)
+    if (element) {
+        element.classList.add('active');
+    }
+    // --- HIGHLIGHT LOGIC END ---
+
     if (page === "dashboard") {
         contentArea.innerHTML = `
             <div class="data-table">
                 <h3 class="page-header">Upload the image here</h3>
-
                 <div class="image-uploader-grid">
                     <div id="image-list" class="image-list-container"></div>
-
                     <label class="add-image-btn">
                         <span>+</span>
                         <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
@@ -84,7 +123,6 @@ function loadPage(page) {
         return;
     }
 
-    // load external html inside dashboard
     fetch(page)
         .then(res => res.text())
         .then(data => {
@@ -94,7 +132,6 @@ function loadPage(page) {
             contentArea.innerHTML = "<h2>Page not found</h2>";
         });
 }
-
 
 /* LIVE PASSWORD CHECK */
 
@@ -199,8 +236,44 @@ function submitToDB() {
    alert("Ready to connect to backend!");
 }
 
-function addData() {
-    alert("Add clicked");
+async function addData() {
+    // 1. Get values from your HTML input IDs
+    const facultyData = {
+        faculty_id: document.getElementById('newName').value,      // Your ID input
+        name: document.getElementById('newCategory').value, 
+        ph_no: document.getElementById('newQty').value,       // Your Name input                                         // Default or add a dept input
+        sub: document.getElementById('newSub').value            // Your Subject input
+                   // Your +91 input
+    };
+
+    // Validation: Check if inputs are empty
+    if (!facultyData.faculty_id || !facultyData.name) {
+        alert("Please fill in at least the ID and Name");
+        return;
+    }
+
+    try {
+        // 2. Send to Python (match the URL to your Flask app)
+        const response = await fetch('http://127.0.0.1:5000/add-faculty', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(facultyData)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(result.message);
+            // Optional: Clear the inputs after saving
+            document.getElementById('newName').value = "";
+            document.getElementById('newCategory').value = "";
+            document.getElementById('newQty').value = "";
+            document.getElementById('newSub').value = "";
+        }
+    } catch (error) {
+        console.error("Error connecting to server:", error);
+        alert("Server is not running. Start your Python script!");
+    }
 }
 
 function editData() {
@@ -215,7 +288,56 @@ function uploadData() {
     alert("Upload clicked");
 }
 
+window.onload = function () {
 
+    const input = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
 
+    let images = [];
 
+    input.addEventListener("change", function (event) {
+        const files = Array.from(event.target.files);
 
+        if (images.length + files.length > 20) {
+            alert("Maximum 20 images allowed");
+            return;
+        }
+
+        files.forEach(file => {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                images.push(e.target.result);
+                displayImages();
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+
+    function displayImages() {
+        preview.innerHTML = "";
+
+        images.forEach((src, index) => {
+            const div = document.createElement("div");
+            div.className = "image-box";
+
+            const img = document.createElement("img");
+            img.src = src;
+
+            const btn = document.createElement("button");
+            btn.innerText = "×";
+            btn.className = "remove-btn";
+
+            btn.onclick = function () {
+                images.splice(index, 1);
+                displayImages();
+            };
+
+            div.appendChild(img);
+            div.appendChild(btn);
+            preview.appendChild(div);
+        });
+    }
+
+};

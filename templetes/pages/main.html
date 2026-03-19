@@ -4,44 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notification System</title>
-    <link rel="stylesheet" href="main_style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main_style.css') }}">
 </head>
 <body>
 
-    <!-- <div class="dashboard-container">
-        <div id="content-area">
-            <nav class="sidebar">
-                <h2>AppLogo</h2>
-                <ul>
-                    <li><a href="#" class="active">Dashboard</a></li>
-                    
-                    <li><a href="#">HOD</a></li>
-                    <li><a href="#" class="faculty-btn" onclick="loadPage('faculty.html')">Faculty</a></li>
-                    <li><a href="#" class="database-btn" onclick="databaseHandle()">Database</a></li>
-                    <li><a href="#" class="payment-btn" onclick="paymentDetails()">Payment</a></li>
-                    <li><a href="#" class="history-btn" onclick="historyDetails()">History</a></li>
-                    <li><a href="#" class="setting-btn" onclick="settingHandle()">Settings</a></li>
-                </ul>
-            </nav>
-        </div> -->
+
 
         <div class="dashboard-container" style="display: flex;">
             <nav class="sidebar">
                 <h2>AppLogo</h2>
-                <ul>
+                <!-- <ul>
                     <li><a href="#" class="active">Dashboard</a></li>
-                    <li><a href="#" onclick="loadPage('hod.html')">HOD</a></li>
-                    <li><a href="#" onclick="loadPage('faculty.html')">Faculty</a></li>
-                    <li><a href="#" onclick="loadPage('payment.html')">Payment</a></li>
-                    <li><a href="#" onclick="loadPage('history.html')">History</a></li>
-                    <li><a href="#" onclick="loadPage('setting.html')">Settings</a></li>
+                    <li><a href="#" onclick="loadPage('/hod')">HOD</a></li>
+                    <li><a href="#" onclick="loadPage('/faculty')">Faculty</a></li>
+                    <li><a href="#" onclick="loadPage('/payment')">Payment</a></li>
+                    <li><a href="#" onclick="loadPage('/history')">History</a></li>
+                    <li><a href="#" onclick="loadPage('/setting')">Settings</a></li>
+                </ul> -->
+                <ul>
+                    <li><a href="#" class="active" onclick="loadPage('dashboard', this)">Dashboard</a></li>
+                    <li><a href="#" onclick="loadPage('/hod', this)">HOD</a></li>
+                    <li><a href="#" onclick="loadPage('/faculty', this)">Faculty</a></li>
+                    <li><a href="#" onclick="loadPage('/payment', this)">Payment</a></li>
+                    <li><a href="#" onclick="loadPage('/history', this)">History</a></li>
+                    <li><a href="#" onclick="loadPage('/setting', this)">Settings</a></li>
                 </ul>
             </nav>
 
             <main class="main-content">
                 <header>
                     <div class="logo">
-                        <img src="JNTUH_logo.png" alt="College Logo">
+                        <img src="{{ url_for('static', filename='JNTUH_logo.png') }}" alt="Logo">
                         
                         <h1>JNTUH FACULTY SMS NOTIFICATION SYSTEM</h1>
                     </div>
@@ -108,7 +101,6 @@ function loadPage(page) {
 <script>
 window.onload = () => loadPage("dashboard");
 </script>
-    <script src="script.js"></script>
-
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

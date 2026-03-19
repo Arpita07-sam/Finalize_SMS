@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='temp_style.css') }}">
 </head>
 <body>
     <div class="login-box">
         <div class="login-header">
-            <img src="JNTUH_logo.png" alt="College Logo">
+            <img src="{{ url_for('static', filename='JNTUH_logo.png') }}" alt="Logo">
+            <!-- <img src="JNTUH_logo.png" alt="College Logo"> -->
             <h2>Registeration</h2>
         </div>
 
@@ -29,11 +30,33 @@
         <label>ENter OTP</label>
         <input type="text" id="otpInput" placeholder="Enter OTP">
 
-        <button onclick="registerUser()">Register</button>
+        <label>Password</label>
+
+        <div class="password-box">
+            <form action="/register" method="POST" onsubmit="return handleFormSubmit(event)">
+                <input type="password" id="password" oninput="validatePassword()" name="password" required>
+                
+                <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem;"></p>
+                <span onclick="togglePassword()" class="show-btn">Show</span> 
+
+                <!-- <button type="submit">Register</button> -->
+            </form>
+            <!-- <form action="/register" method="POST" onsubmit="return checkForm(event)">
+                <input type="password" id="password" oninput="validatePassword()" name="password" required>
+                <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem;"></p>
+                <span onclick="togglePassword()" class="show-btn">Show</span>
+            </form> -->
+
+            <!-- <input type="password" id="password" placeholder="Enter password" onkeyup=" validatePassword()">
+            <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 5px;"></p>
+            <span onclick="togglePassword()" class="show-btn">Show</span> -->
+        </div>
+
+        <button onclick="registerUser()">Register and Login</button>
 
     </div>
 
-<script src="script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
     
 </body>
 </html>
