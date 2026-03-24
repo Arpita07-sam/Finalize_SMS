@@ -6,11 +6,11 @@ def connect_db():
 
     cursor.execute("""
 CREATE TABLE IF NOT EXISTS faculty (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                faculty_id INTERGER,
-                name TEXT,
-                ph_no TEXT,
-                sub TEXT
+                faculty_id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                ph_no TEXT UNIQUE
+                   CHECK(length(ph_no) = 10),
+                sub TEXT NOT NULL
                 )           
 """)
     conn.commit()
@@ -43,3 +43,38 @@ def get_all_faculty():
     conn.close()
     return faculty_list
 
+def update_faculty(id, faculty_id, name, ph_no, sub):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE faculty
+        SET faculty_id = ?, name = ?, ph_no = ?, sub = ?
+        WHERE id = ?
+    """, (faculty_id, name, ph_no, sub, id))
+
+    conn.commit()
+    affected = cursor.rowcount
+    conn.close()
+
+    return affected
+
+def delete_faculty(id):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM faculty WHERE id = ?", (id,))
+    conn.commit()
+
+    affected = cursor.rowcount
+    conn.close()
+
+    return affected
+
+
+def get_db_connection():
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+connect_db()

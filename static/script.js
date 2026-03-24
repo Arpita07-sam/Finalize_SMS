@@ -236,6 +236,7 @@ function submitToDB() {
    alert("Ready to connect to backend!");
 }
 
+ 
 async function addData() {
     // 1. Get values from your HTML input IDs
     const facultyData = {
@@ -247,9 +248,26 @@ async function addData() {
     };
 
     // Validation: Check if inputs are empty
-    if (!facultyData.faculty_id || !facultyData.name) {
+    if (!facultyData.faculty_id || !facultyData.name || !facultyData.ph_no || !facultyData.sub) {
         alert("Please fill in at least the ID and Name");
         return;
+    }
+
+    if (facultyData.ph_no.length != 10) {
+        alert("Phone number must be 10 digits.");
+        return
+    }
+
+    let idExists = facultyData.some(f => f.faculty_id == facultyData.faculty_id);
+    if (idExists) {
+        alert("Faculty ID already exists")
+        return
+    }
+
+    let phExists = facultyData.some(f => f.ph_no == facultyData.ph_no);
+    if (phExists) {
+        alert("Phone number already exists")
+        return
     }
 
     try {
@@ -264,6 +282,7 @@ async function addData() {
         
         if (response.ok) {
             alert(result.message);
+            // setTimeout(loadFaculty, 500);
             // Optional: Clear the inputs after saving
             document.getElementById('newName').value = "";
             document.getElementById('newCategory').value = "";
@@ -276,12 +295,117 @@ async function addData() {
     }
 }
 
-function editData() {
-    alert("Edit clicked");
+
+function loadFaculty() {
+    console.log("Loading...");
+    fetch("http://127.0.0.1:5000/get-faculty")
+    .then(res => res.json())
+    .then(data => {
+        const tableBody = document.getElementById("faculty-table-body");
+        tableBody.innerHTML = "";
+
+        data.forEach(f => {
+            let row = document.createElement("tr");
+            let td1 = document.createElement("td");
+            td1.innerText = f.faculty_id;  
+
+            let td2 = document.createElement("td");
+            td2.innerText = f.name;
+            
+            let td3 = document.createElement("td");
+            td3.innerText = f.ph_no;
+            
+            let td4 = document.createElement("td");
+            td4.innerText = f.sub;
+
+            let td5 = document.createElement("td");
+            td5.innerHTML = `
+                <span onclick="editRow(this)">✏️</span>
+                &nbsp;
+                <span onclick="deleteRow(this)">🗑️</span>
+            `;
+
+            row.appendChild(td1);
+            row.appendChild(td2);
+            row.appendChild(td3);
+            row.appendChild(td4);
+            row.appendChild(td5);
+            tableBody.appendChild(row);
+        });
+    });
 }
 
-function deleteData() {
-    alert("Delete clicked");
+
+function saveData() {
+    let rows = document.querySelectorAll("#data-table tbody tr");
+    let updatedData = [];
+    rows.forEach(row => {
+        let cells = row.querySelectorAll("td");
+        updatedData.push({
+            faculty_id: cells[0].innerText,
+            name: cells[1].innerText,
+            ph_no: cells[2].innerText,
+            sub: cells[3].innerText
+        });
+    });
+    fetch("/update-faculty", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Changes saved");
+        loadFaculty(); // reload updated data
+    });
+}
+
+function editRow(icon){
+    let row = icon.closest("tr");
+    let name = row.children[1];
+    let phone = row.children[2];
+    let subject = row.children[3];
+    // check mode
+    if(icon.innerText == "✏️"){
+        name.contentEditable = true;
+        phone.contentEditable = true;
+        subject.contentEditable = true;
+        row.style.backgroundColor = "#fff3cd";
+        icon.innerText = "💾";
+    }
+    else{
+        let id = row.children[0].innerText;
+        let updatedData = {
+            name: name.innerText,
+            ph_no: phone.innerText,
+            sub: subject.innerText
+        };
+        fetch(`http://127.0.0.1:5000/update-faculty/${id}`,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(updatedData)
+        });
+        name.contentEditable = false;
+        phone.contentEditable = false;
+        subject.contentEditable = false;
+        row.style.backgroundColor = "";
+        icon.innerText = "✏️";
+    }
+}
+
+function deleteRow(icon){
+    let row = icon.closest("tr");
+    let id = row.children[0].innerText;
+    if(!confirm("Delete this record?"))
+        return;
+    fetch(`http://127.0.0.1:5000/delete-faculty/${id}`,{
+        method:"DELETE"
+    });
+    row.remove();
 }
 
 function uploadData() {

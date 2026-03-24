@@ -128,7 +128,7 @@ def get_embedding(path):
 
 
 # ---------------- INPUT ----------------
-test_signature = "signatures/full_forg/forgeries_3_6.png"
+test_signature = "signatures/new_writers/ref37.jpeg"
 user = "staff2"
 
 db = f"office_database/{user}"

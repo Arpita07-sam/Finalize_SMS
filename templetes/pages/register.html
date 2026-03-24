@@ -15,19 +15,17 @@
         </div>
 
         <label>Department</label>
-        <input type="text" placeholder="Enter Department">
+        <input type="text" id="dept" placeholder="Enter Department">
 
         <label>ID number</label>
-        <input type="text" placeholder="Enter Id number">
+        <input type="text" id="id" placeholder="Enter Id number">
 
         <label>Phone number</label>
-        <input type="text" placeholder="ENter phone number">
-
-       
+        <input type="text" id="phno" placeholder="ENter phone number">
 
         <button class="opt-btn" onclick="generateOTP()">Generate OTP</button>
 
-        <label>ENter OTP</label>
+        <label>Enter OTP</label>
         <input type="text" id="otpInput" placeholder="Enter OTP">
 
         <label>Password</label>
@@ -38,18 +36,7 @@
                 
                 <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem;"></p>
                 <span onclick="togglePassword()" class="show-btn">Show</span> 
-
-                <!-- <button type="submit">Register</button> -->
             </form>
-            <!-- <form action="/register" method="POST" onsubmit="return checkForm(event)">
-                <input type="password" id="password" oninput="validatePassword()" name="password" required>
-                <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem;"></p>
-                <span onclick="togglePassword()" class="show-btn">Show</span>
-            </form> -->
-
-            <!-- <input type="password" id="password" placeholder="Enter password" onkeyup=" validatePassword()">
-            <p id="password-hint" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 5px;"></p>
-            <span onclick="togglePassword()" class="show-btn">Show</span> -->
         </div>
 
         <button onclick="registerUser()">Register and Login</button>
