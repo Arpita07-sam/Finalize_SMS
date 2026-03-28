@@ -1,7 +1,7 @@
 import cv2
 import os
 
-image_path = "sign_page.png"
+image_path = "sign_page.jpeg"
 output_folder = "cropped_signatures"
 os.makedirs(output_folder, exist_ok=True)
 
