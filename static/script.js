@@ -7,33 +7,44 @@ function loginFunction() {
    window.location.href = "/login";
 }
 
+/* Verification code */
+function sendCode()
+{
+    let email = document.getElementById("email").value;
+    fetch("/send-code", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({email: email})
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+}
 
-/* OTP GENERATE */
-
-let generatedOTP;
-
-function generateOTP(){
-   generatedOTP = Math.floor(1000 + Math.random() * 9000);
-   alert("Your OTP: " + generatedOTP);   // for testing
+function verifyCode()
+{
+    let email = document.getElementById("email").value;
+    let code = document.getElementById("otpInput").value;
+    fetch("/verify-code", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            code: code
+        })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
 }
 
 
-/* REGISTER CHECK */
 
-function registerUser(){
-   let enteredOTP = document.getElementById("otpInput").value;
-
-   if(enteredOTP == generatedOTP){
-      alert("Registered Successfully!");
-   }else{
-      alert("Wrong OTP");
-   }
-   window.location.href = "/dashboard";
-}
-
-function loginUser() {
-    window.location.href = "/dashboard";
-}
+// function loginUser() {
+//     window.location.href = "/dashboard";
+// }
 
 // 1. Create a global variable to track status
 let passwordReady = false;
@@ -74,8 +85,6 @@ function handleFormSubmit(event) {
     }
 }
 
-
-
 /* SHOW PASSWORD */
 
 function togglePassword(){
@@ -91,46 +100,64 @@ function togglePassword(){
    }
 }
 
-function loadPage(page, element) { // Added 'element' parameter
-    const contentArea = document.getElementById("content-area");
+function registerUser()
+{
+    let dept = document.getElementById("dept").value;
+    let email = document.getElementById("email").value;
+    let phno2 = document.getElementById("phno2").value;
+    let phno1 = document.getElementById("phno1").value;
+    let password = document.getElementById("password").value;
 
-    // --- HIGHLIGHT LOGIC START ---
-    // 1. Remove 'active' class from all sidebar links
-    const links = document.querySelectorAll('.sidebar ul li a');
-    links.forEach(link => link.classList.remove('active'));
+    // if(!dept || !email || !phno1 || !phno2 || !password) {
+    //     alert("Please fill all fields");
+    //     return;
+    // }
 
-    // 2. Add 'active' class to the clicked element (if provided)
-    if (element) {
-        element.classList.add('active');
-    }
-    // --- HIGHLIGHT LOGIC END ---
-
-    if (page === "dashboard") {
-        contentArea.innerHTML = `
-            <div class="data-table">
-                <h3 class="page-header">Upload the image here</h3>
-                <div class="image-uploader-grid">
-                    <div id="image-list" class="image-list-container"></div>
-                    <label class="add-image-btn">
-                        <span>+</span>
-                        <input type="file" id="multi-upload" accept="image/*" multiple onchange="handleMultipleUpload(event)">
-                    </label>
-                </div>
-                <br>
-                <p>Your latest project updates will appear here.</p>
-            </div>
-        `;
-        return;
-    }
-
-    fetch(page)
-        .then(res => res.text())
-        .then(data => {
-            contentArea.innerHTML = data;
+    fetch("/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            dept: dept,
+            email: email,
+            phno2: phno2,
+            phno1: phno1, 
+            password: password
         })
-        .catch(err => {
-            contentArea.innerHTML = "<h2>Page not found</h2>";
-        });
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        alert(data.message);
+
+        if(data.status == "success") {
+            window.location.href = "/login";
+        }
+    })
+    .catch(error => console.log(error));
+}
+
+async function loginUser() {
+    const data = {
+        dept: document.getElementById("dept").value,
+        phno2: document.getElementById("phno2").value,
+        password: document.getElementById("password").value
+    }
+
+    const response = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(data)
+    })
+
+    const result = await response.json()
+    if(result.status == "success") {
+        alert("Login successfull..")
+        window.location.href = "/dashboard"
+    } else {
+        alert(result.message)
+    }
 }
 
 /* LIVE PASSWORD CHECK */
@@ -153,9 +180,6 @@ document.getElementById("special").style.color =
 
 }
 
-function logout(){
-   window.location.href = "login.html";
-}
 
 function toggleMenu(){
 
@@ -214,6 +238,8 @@ function handleMultipleUpload(event) {
     event.target.value = "";
 }
 
+
+
 function submitToDB() {
    // 1. Grab values from the input fields
    const name = document.getElementById('newName').value;
@@ -236,64 +262,66 @@ function submitToDB() {
    alert("Ready to connect to backend!");
 }
 
- 
+
+
 async function addData() {
-    // 1. Get values from your HTML input IDs
     const facultyData = {
-        faculty_id: document.getElementById('newName').value,      // Your ID input
-        name: document.getElementById('newCategory').value, 
-        ph_no: document.getElementById('newQty').value,       // Your Name input                                         // Default or add a dept input
-        sub: document.getElementById('newSub').value            // Your Subject input
-                   // Your +91 input
+        faculty_id: document.getElementById('newName').value.trim(),
+        name: document.getElementById('newCategory').value.trim(),
+        ph_no: document.getElementById('newQty').value.trim(),
+        sub: document.getElementById('newSub').value.trim()
     };
 
-    // Validation: Check if inputs are empty
+    // empty check
     if (!facultyData.faculty_id || !facultyData.name || !facultyData.ph_no || !facultyData.sub) {
-        alert("Please fill in at least the ID and Name");
+        alert("Fill all fields");
         return;
     }
 
+    // phone validation
     if (facultyData.ph_no.length != 10) {
-        alert("Phone number must be 10 digits.");
-        return
+        alert("Phone number must be 10 digits");
+        return;
     }
 
-    let idExists = facultyData.some(f => f.faculty_id == facultyData.faculty_id);
-    if (idExists) {
-        alert("Faculty ID already exists")
-        return
-    }
+    // duplicate check from table
+    let rows = document.querySelectorAll("#faculty-table-body tr");
+    for (let r of rows) {
+        let existingID = r.cells[0].innerText;
+        let existingPH = r.cells[2].innerText;
 
-    let phExists = facultyData.some(f => f.ph_no == facultyData.ph_no);
-    if (phExists) {
-        alert("Phone number already exists")
-        return
+        if (existingID == facultyData.faculty_id) {
+            alert("ID already exists");
+            return;
+        }
+
+        if (existingPH == facultyData.ph_no) {
+            alert("Phone already exists");
+            return;
+        }
     }
 
     try {
-        // 2. Send to Python (match the URL to your Flask app)
         const response = await fetch('http://127.0.0.1:5000/add-faculty', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(facultyData)
         });
-
         const result = await response.json();
-        
-        if (response.ok) {
-            alert(result.message);
-            // setTimeout(loadFaculty, 500);
-            // Optional: Clear the inputs after saving
-            document.getElementById('newName').value = "";
-            document.getElementById('newCategory').value = "";
-            document.getElementById('newQty').value = "";
-            document.getElementById('newSub').value = "";
-        }
-    } catch (error) {
-        console.error("Error connecting to server:", error);
-        alert("Server is not running. Start your Python script!");
+        alert(result.message);
+    }
+    catch(error) {
+        console.error(error);
+        alert("Error connecting to Flask");
+
     }
 }
+
+
+  
+
+
+
 
 
 function loadFaculty() {

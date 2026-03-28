@@ -6,6 +6,7 @@ body{
    justify-content: center;
    align-items: center;
    height: 100vh;
+   /* overflow-y: auto; */
 }
 
 /* LOGO + TITLE SIDE BY SIDE */
@@ -15,7 +16,9 @@ body{
    align-items: center;
    justify-content: center;
    gap: 12px;           /* space between logo & text */
-   margin-bottom: 5px;
+   /* margin-bottom: 5px; */
+   margin-bottom: 20px;
+   margin-top: 10px;
 }
 
 .login-header img{
@@ -33,9 +36,12 @@ body{
 .login-box{
    background: white;
    padding: 30px 40px;
-   width: 350px;
+   width: 600px;
    border-radius: 10px;
    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+   /* margin-bottom: 20px;
+   margin-top: 10px; */
+
 }
 
 /* TITLE */
@@ -84,45 +90,105 @@ button:hover{
 }
 
 
-/* OTP BUTTON */
 
-.otp-btn{
-   background: #ffcc00;
-   color: black;
+.form-container {
+    max-height: 300px;   /* visible height */
+    /* overflow-y: auto;    vertical scroll */
+    padding-right: 10px; /* space for scrollbar */
 }
 
-.otp-btn:hover{
-   background: #ffaa00;
+.verification-section{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    margin-top:8px;
+}
+
+.verification-section{
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+}
+
+/* LEFT SIDE inputs */
+.verification-inputs{
+    flex:2;
+    display:flex;
+    flex-direction:column;
+}
+
+/* RIGHT SIDE buttons */
+.verification-buttons{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    margin-top:19px; /* aligns with first input */
+}
+
+/* keep buttons compact */
+.opt-btn,
+.verify-btn{
+    width:280px;
+}
+
+.opt-btn {
+   /* display: block; */
+   margin-left: 10px;
+   padding: 9px 10px;
+   font-size: 13px;
+
+}
+
+.opt-btn:hover {
+   background-color: #0056b3;
 }
 
 /* PASSWORD BOX */
-
 .password-box{
    position: relative;
+   width: 88%;
 }
 
 .password-box input{
-   width: 87%;
+   width: 100%;
    padding: 8px;
-   padding-right: 55px;   /* space for show button */
+   padding-right: 60px; /* space for Show button */
+   border-radius: 5px;
+   border: 2px solid #e4e0e0;
+   font-size: 10px;
 }
 
 /* SHOW BUTTON */
 
 .show-btn{
    position: absolute;
-   right: 2px;
+   right: 0px;
    top: 50%;
-   transform: translateY(-30%);
+   transform: translateY(-50%);
    cursor: pointer;
-   font-size: 14px;
-   color: #002147;
-   font-weight: bold;
+   color: #142d48;
+   font-weight: 600;
 }
 
 .show-btn:hover{
    color: #ff6600;
 }
+
+
+.title {
+    text-align: center;
+}
+.logo {
+   position: absolute;
+   left: 170px;
+}
+
+.logo img {
+    height: 88px;
+}
+
+
 
 /* MENU BUTTON */
 
@@ -135,9 +201,7 @@ button:hover{
    z-index: 1000;
 }
 
-
 /* SIDEBAR */
-
 .sidebar{
    position: fixed;
    left: -230px;        /* hidden */

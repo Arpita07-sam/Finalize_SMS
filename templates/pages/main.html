@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main_style.css') }}">
+</head>
+<body>
+    <section class="content-area" id="content-area">
+        {% extends "pages/block.html" %}
+        {% block content %}
+            <div class="data-table">
+                <h3 class="page-header">Upload the image here</h3>
+                <div class="image-uploader-grid">
+                    <div id="image-list" class="image-list-container"></div>
+                    <label class="add-image-btn">
+                    <span>+</span>
+                    <input type="file" accept="image/*" multiple onchange="handleMultipleUpload(event)">
+                    </label>
+                </div>
+                <br>
+                <p>Your latest project updates will appear here.</p>
+                <!-- <button class="submit-button" onclick="mlProcess()">Extract</button> -->
+                <button onclick="startExtraction()" class="extract-btn">Extract</button>
+                <!-- PIPELINE -->
+                <!-- <div id="pipeline" class="pipeline hidden"> -->
+                    <!-- <div class="step" id="step1">
+                        <div class="circle">1</div>
+                        <p>Load Images</p>
+                    </div>
+                    <div class="line" id="line1"></div>
+                    <div class="step" id="step2">
+                        <div class="circle">2</div>
+                        <p>Verify signature</p>
+                    </div>
+                    <div class="line" id="line2"></div>
+                    <div class="step" id="step3">
+                        <div class="circle">3</div>
+                        <p>Extract Text</p>
+                    </div>
+                    <div class="line" id="line3"></div>
+                    <div class="step" id="step4">
+                        <div class="circle">4</div>
+                        <p>Verify</p>
+                    </div>
+                    <div class="line" id="line4"></div>
+                    <div class="step" id="step5">
+                        <div class="circle">5</div>
+                        <p>Sending SMS</p>
+                    </div> -->
+                <div class="pipeline-wrapper">
+                    <div id="pipeline" class="pipeline hidden">
+                        <div class="step" id="step0">
+                            <div class="circle">S</div>
+                            <p>Start</p>
+                        </div>
+                        <div class="line" id="line0"></div>
+                        <div class="step" id="step1">
+                            <div class="circle">1</div>
+                            <p>Load Images</p>
+                        </div>
+                        <div class="line" id="line1"></div>
+                        <div class="step" id="step2">
+                            <div class="circle">2</div>
+                            <p>Verify Signature</p>
+                        </div>
+                        <div class="line" id="line2"></div>
+                        <div class="step" id="step3">
+                            <div class="circle">3</div>
+                            <p>Extract Text</p>
+                        </div>
+                        <div class="line" id="line3"></div>
+                        <div class="step" id="step4">
+                            <div class="circle">4</div>
+                            <p>Verify Data</p>
+                        </div>
+                        <div class="line" id="line4"></div>
+                        <div class="step" id="step5">
+                            <div class="circle">5</div>
+                            <p>Send SMS</p>
+                        </div>
+                        <div class="line" id="line5"></div>
+                        <div class="step" id="step6">
+                            <div class="circle">✔</div>
+                            <p>Done</p>
+                        </div>
+
+                    </div>
+                        
+
+                </div>
+            </div>
+        </div>
+    </section>
+<script>
+function startExtraction() {
+    console.log("Extract clicked")   // check in browser console
+    document.getElementById("pipeline").classList.remove("hidden")
+    runStep("step0", "line0", 500)
+    runStep("step1","line1",1000)
+    runStep("step2","line2",1600)
+    runStep("step3","line3",2200)
+    runStep("step4","line4",2800)
+    runStep("step5", "line5", 3400)
+    runStep("step6",null,4000)
+        fetch("/extract",{
+            method:"POST"
+            })
+}
+function runStep(step,line,delay){
+    setTimeout(()=>{
+        document.getElementById(step).classList.add("completed")
+        if(line){
+            document.getElementById(line).classList.add("completed")
+        }
+    },delay)
+}
+</script>
+{% endblock %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

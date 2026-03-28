@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templates</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='temp_style.css') }}"> -->
+<style>
+    #rectangle1 {
+        display: table;
+        width:800px;
+        height: 150px;
+        background: #f1b4ad;
+    }
+</style>
+</head>
+<body>
+    {% extends "pages/block.html" %}
+    {%  block content %}
+        <h2>All the templates can be saved and edited here in this page</h2>
+        <br>
+        <div id="rectangle1">
+            <h3>Template 1</h3>
+            <h4>Lab exam template</h4>
+            <p>Mr/Ms {faculty} assigned as Invigilator for {subject} ({B.Tech Year/Sem}) in Room {room_no} on {date}, {time}.</p>
+            <button id="edit-btn" onclick="editFunc()">Edit</button>
+        </div>
+        <div id="rectangle2">
+            <h3>Template 2</h3>
+            <h4>Semester Exam template</h4>
+            <p></p>
+        </div>
+    {% endblock %}
+
+<script>
+    
+</script>
+    
+</body>
+</html>

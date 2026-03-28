@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='temp_style.css') }}">
+    <!-- <link rel="stylesheet" href="static/style.css"> -->
+</head>
+<body>
+    {% extends "pages/block.html" %}
+    {% block content %}
+    <div class="pipeline">
+        <div class="step completed">
+            <div class="circle">✔</div>
+            <p>Upload</p>
+        </div>
+        <div class="line completed"></div>
+        <div class="step completed">
+            <div class="circle">✔</div>
+            <p>Extract</p>
+        </div>
+        <div class="line completed"></div>
+        <div class="step failed">
+            <div class="circle">✖</div>
+            <p>Parse</p>
+        </div>
+        <div class="line"></div>
+        <div class="step pending">
+            <div class="circle"></div>
+            <p>Validate</p>
+        </div>
+        <div class="line"></div>
+        <div class="step pending">
+            <div class="circle"></div>
+            <p>Signature</p>
+        </div>
+        <div class="line"></div>
+        <div class="step pending">
+            <div class="circle"></div>
+            <p>Database</p>
+        </div>
+    </div>
+    {% endblock %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

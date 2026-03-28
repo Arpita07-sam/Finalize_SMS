@@ -16,8 +16,6 @@ height: 200px;
 background: #aaa;
 }
 
-
-
 .register-btn{
    background-color: #0c0a09;
    color: rgb(231, 227, 227);
@@ -56,6 +54,229 @@ background: #aaa;
     font-weight: bold;
 }
 
+.login-body{
+   margin: 0;
+   font-family: Arial, sans-serif;
+   background: #f4f6f8;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+   /* overflow-y: auto; */
+}
 
+/* LOGO + TITLE SIDE BY SIDE */
+
+.log-header{
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 12px;           /* space between logo & text */
+   /* margin-bottom: 5px; */
+   margin-bottom: 20px;
+   margin-top: 10px;
+}
+
+.log-header img{
+   height: 50px;        /* adjust if needed */
+}
+
+.log-header h2{
+   margin: 0;
+   color: #002147;
+}
+
+
+/* BOX */
+
+.log-box{
+   background: white;
+   padding: 30px 40px;
+   width: 400px;
+   border-radius: 10px;
+   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+   /* margin-bottom: 20px;
+   margin-top: 10px; */
+
+}
+
+/* TITLE */
+
+.login-box h2{
+   text-align: center;
+   margin-bottom: 20px;
+   color: #002147;
+}
+
+
+/* LABELS */
+
+label{
+   font-weight: bold;
+   display: block;
+   margin-top: 10px;
+}
+
+/* INPUTS */
+
+input{
+   width: 100%;
+   padding: 8px;
+   margin-top: 5px;
+   border-radius: 5px;
+   border: 1px solid #ccc;
+}
+
+/* BUTTONS */
+
+button{
+   width: 103%;
+   padding: 10px;
+   margin-top: 15px;
+   border: none;
+   border-radius: 5px;
+   background: #002147;
+   color: white;
+   font-weight: bold;
+   cursor: pointer;
+}
+
+button:hover{
+   background: #003b7a;
+}
+
+.show-btn{
+   position: absolute;
+   right: 433px;
+   top: 66%;
+   transform: translateY(-50%);
+   cursor: pointer;
+   color: #142d48;
+   font-weight: 600;
+}
+
+.show-btn:hover{
+   color: #ff6600;
+}
+
+/* .pipeline{
+display:flex;
+align-items:center;
+justify-content:center;
+margin-top:50px;
+flex-wrap:wrap;
+font-family:Arial;
+}
+
+.step{
+text-align:center;
+position:relative;
+}
+
+.circle{
+width:35px;
+height:35px;
+border-radius:50%;
+border:2px solid gray;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+font-size:18px;
+background:white;
+}
+
+.line{
+width:80px;
+height:3px;
+background:gray;
+}
+
+.completed .circle{
+border-color:green;
+color:white;
+background:green;
+}
+
+.completed + .line{
+background:green;
+}
+
+.failed .circle{
+border-color:red;
+color:white;
+background:red;
+}
+
+.pending .circle{
+border-color:gray;
+background:white;
+}
+
+p{
+margin-top:8px;
+font-size:14px;
+} */
+
+
+.pipeline{
+display:flex;
+align-items:center;
+margin-top:30px;
+flex-wrap:wrap;
+}
+
+.step{
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-right:10px;
+font-size:12px;
+}
+
+.circle{
+width:28px;
+height:28px;
+border-radius:50%;
+border:2px solid gray;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
+background:white;
+}
+
+.line{
+width:40px;
+height:2px;
+background:gray;
+margin:0 5px;
+}
+
+/* states */
+
+.completed .circle{
+background:#2ecc71;
+color:white;
+border:none;
+}
+
+.completed + .line{
+background:#2ecc71;
+}
+
+.failed .circle{
+background:#e74c3c;
+color:white;
+border:none;
+}
+
+.active .circle{
+border:2px solid #3498db;
+}
+
+.pending .circle{
+background:white;
+}
 
 
