@@ -1,12 +1,14 @@
 import sqlite3
 
 def connect_db():
-    conn = sqlite3.connect("data.db")
+    conn = sqlite3.connect("instance/users.db")
     cursor = conn.cursor()
 
     cursor.execute("""
 CREATE TABLE IF NOT EXISTS faculty (
-                faculty_id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,      
+                faculty_id INTEGER,
                 name TEXT NOT NULL,
                 ph_no TEXT UNIQUE
                    CHECK(length(ph_no) = 10),
@@ -16,13 +18,13 @@ CREATE TABLE IF NOT EXISTS faculty (
     conn.commit()
     conn.close()
 
-def insert_faculty(faculty_id, name, ph_no, sub):
-    conn = sqlite3.connect("data.db")
+def insert_faculty(user_id, faculty_id, name, ph_no, sub):
+    conn = sqlite3.connect("instance/users.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO faculty(faculty_id, name, ph_no, sub)
-    VALUES (?, ?, ?, ?) """, (faculty_id, name, ph_no, sub))
+    INSERT INTO faculty(user_id, faculty_id, name, ph_no, sub)
+    VALUES (?, ?, ?, ?, ?) """, (user_id, faculty_id, name, ph_no, sub))
 
     conn.commit()
     conn.close()
@@ -30,7 +32,7 @@ def insert_faculty(faculty_id, name, ph_no, sub):
     return "Saved successfully"
 
 def get_all_faculty():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect("instance/users.db")
     conn.row_factory = sqlite3.Row  # This allows accessing columns by name
     cursor = conn.cursor()
     
@@ -43,7 +45,7 @@ def get_all_faculty():
     conn.close()
     return faculty_list
 
-def update_faculty(id, faculty_id, name, ph_no, sub):
+def update_faculty(user_id, faculty_id, name, ph_no, sub):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
@@ -51,7 +53,7 @@ def update_faculty(id, faculty_id, name, ph_no, sub):
         UPDATE faculty
         SET faculty_id = ?, name = ?, ph_no = ?, sub = ?
         WHERE id = ?
-    """, (faculty_id, name, ph_no, sub, id))
+    """, (faculty_id, name, ph_no, sub, user_id))
 
     conn.commit()
     affected = cursor.rowcount
@@ -73,7 +75,18 @@ def delete_faculty(id):
 
 
 def get_db_connection():
-    conn = sqlite3.connect("data.db")
+    conn = sqlite3.connect("instance/users.db")
     conn.row_factory = sqlite3.Row
     return conn
 
+
+
+# import sqlite3
+
+# conn = sqlite3.connect("instance/users.db")
+# cursor = conn.cursor()
+
+# cursor.execute("DROP TABLE faculty")
+
+# conn.commit()
+# conn.close()

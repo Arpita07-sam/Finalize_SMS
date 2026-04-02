@@ -23,32 +23,6 @@
                 <p>Your latest project updates will appear here.</p>
                 <!-- <button class="submit-button" onclick="mlProcess()">Extract</button> -->
                 <button onclick="startExtraction()" class="extract-btn">Extract</button>
-                <!-- PIPELINE -->
-                <!-- <div id="pipeline" class="pipeline hidden"> -->
-                    <!-- <div class="step" id="step1">
-                        <div class="circle">1</div>
-                        <p>Load Images</p>
-                    </div>
-                    <div class="line" id="line1"></div>
-                    <div class="step" id="step2">
-                        <div class="circle">2</div>
-                        <p>Verify signature</p>
-                    </div>
-                    <div class="line" id="line2"></div>
-                    <div class="step" id="step3">
-                        <div class="circle">3</div>
-                        <p>Extract Text</p>
-                    </div>
-                    <div class="line" id="line3"></div>
-                    <div class="step" id="step4">
-                        <div class="circle">4</div>
-                        <p>Verify</p>
-                    </div>
-                    <div class="line" id="line4"></div>
-                    <div class="step" id="step5">
-                        <div class="circle">5</div>
-                        <p>Sending SMS</p>
-                    </div> -->
                 <div class="pipeline-wrapper">
                     <div id="pipeline" class="pipeline hidden">
                         <div class="step" id="step0">
@@ -85,37 +59,137 @@
                             <div class="circle">✔</div>
                             <p>Done</p>
                         </div>
-
                     </div>
-                        
-
                 </div>
+            </div> 
+        </div>                      
+    </section>
+    <!-- Permission Popup -->
+    <div id="permissionBox" class="permission-box" style="display:none;">
+        <div class="permission-content">
+            <div class="icon">💬</div>
+            <h3 id="permissionTitle">Permission Required</h3>
+            <p id="permissionMessage">System wants to perform an action.</p>
+            <div class="btn-group">
+                <button onclick="sendPermission(true)" class="yes-btn">Yes</button>
+                <button onclick="sendPermission(false)" class="no-btn">No</button>
             </div>
         </div>
-    </section>
+    </div>
+           
+        
+    
 <script>
+// function startExtraction() {
+//     console.log("Extract clicked")   // check in browser console
+//     document.getElementById("pipeline").classList.remove("hidden")
+//     runStep("step0", "line0", 500)
+//     runStep("step1","line1",1000)
+//     runStep("step2","line2",1600)
+//     runStep("step3","line3",2200)
+//     runStep("step4","line4",2800)
+//     runStep("step5", "line5", 3400)
+//     runStep("step6",null,4000)
+//         fetch("/extract",{
+//             method:"POST"
+//             })
+// }
+// function runStep(step,line,delay){
+//     setTimeout(()=>{
+//         document.getElementById(step).classList.add("completed")
+//         if(line){
+//             document.getElementById(line).classList.add("completed")
+//         }
+//     },delay)
+// }
+let currentStep = 0
+const steps = [
+    {
+        id:"step0",
+        line:"line0",
+        message:"System will start the extraction process"
+    },
+    {
+        id:"step1",
+        line:"line1",
+        message:"System will load uploaded images"
+    },
+    {
+        id:"step2",
+        line:"line2",
+        message:"System will verify signature"
+    },
+    {
+        id:"step3",
+        line:"line3",
+        message:"System will extract text from image"
+    },
+    {
+        id:"step4",
+        line:"line4",
+        message:"System will verify extracted data"
+    },
+    {
+        id:"step5",
+        line:"line5",
+        message:"System will send SMS notification"
+    },
+    {
+        id:"step6",
+        line:null,
+        message:"Process completed"
+    }
+]
+
 function startExtraction() {
-    console.log("Extract clicked")   // check in browser console
     document.getElementById("pipeline").classList.remove("hidden")
-    runStep("step0", "line0", 500)
-    runStep("step1","line1",1000)
-    runStep("step2","line2",1600)
-    runStep("step3","line3",2200)
-    runStep("step4","line4",2800)
-    runStep("step5", "line5", 3400)
-    runStep("step6",null,4000)
-        fetch("/extract",{
-            method:"POST"
-            })
+    currentStep = 0
+    runNextStep()
 }
-function runStep(step,line,delay){
-    setTimeout(()=>{
-        document.getElementById(step).classList.add("completed")
-        if(line){
-            document.getElementById(line).classList.add("completed")
+
+function runNextStep() {
+    if(currentStep >= steps.length) {
+        fetch("/extract",{ method:"POST" })
+        return
+    }
+    let stepData = steps[currentStep]
+    showPermission(stepData.message)
+}
+
+function sendPermission(value) {
+    document.getElementById("permissionBox").style.display = "none"
+    if(value) {
+        let stepData = steps[currentStep]
+        document.getElementById(stepData.id).classList.add("completed")
+        if(stepData.line) {
+            document.getElementById(stepData.line).classList.add("completed")
         }
-    },delay)
+        currentStep++
+        setTimeout(runNextStep,600)
+    }
+    else {
+        alert("Process stopped by user")
+    }
 }
+
+function showPermission(message) {
+    let stepData = steps[currentStep]
+    let stepElement = document.getElementById(stepData.id)
+    let box = document.getElementById("permissionBox")
+    document.getElementById("permissionMessage").innerText = message
+    // 🔥 get position of step
+    let rect = stepElement.getBoundingClientRect()
+    // 🔥 place popup BELOW step (outside container)
+    box.style.top = (rect.bottom + 10) + "px"
+    box.style.left = (rect.left + rect.width/2 - 110) + "px"
+    box.style.display = "block"
+}
+
+/* function showPermission(message) {
+    document.getElementById("permissionMessage").innerText = message
+    document.getElementById("permissionBox").style.display = "block"
+} */
+
 </script>
 {% endblock %}
 <script src="{{ url_for('static', filename='script.js') }}"></script>

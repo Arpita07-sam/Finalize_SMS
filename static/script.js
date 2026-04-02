@@ -8,37 +8,7 @@ function loginFunction() {
 }
 
 /* Verification code */
-function sendCode()
-{
-    let email = document.getElementById("email").value;
-    fetch("/send-code", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({email: email})
-    })
-    .then(res => res.json())
-    .then(data => alert(data.message));
-}
 
-function verifyCode()
-{
-    let email = document.getElementById("email").value;
-    let code = document.getElementById("otpInput").value;
-    fetch("/verify-code", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            code: code
-        })
-    })
-    .then(res => res.json())
-    .then(data => alert(data.message));
-}
 
 
 
@@ -58,7 +28,6 @@ function validatePassword() {
         passwordReady = false;
         return;
     }
-
     // Check conditions
     if (password.length < 8) {
         hint.innerText = "● Must be at least 8 characters";
@@ -102,10 +71,14 @@ function togglePassword(){
 
 function registerUser()
 {
-    let dept = document.getElementById("dept").value;
+    let dept_name = document.getElementById("dept_name").value;
+    let dept_id = document.getElementById("dept_id").value;
+    let hod_name = document.getElementById("hod_name").value;
+    let tech_name = document.getElementById("tech_name").value;
+
     let email = document.getElementById("email").value;
-    let phno2 = document.getElementById("phno2").value;
-    let phno1 = document.getElementById("phno1").value;
+    let tech_phno = document.getElementById("tech_phno").value;
+    let hod_phno = document.getElementById("hod_phno").value;
     let password = document.getElementById("password").value;
 
     // if(!dept || !email || !phno1 || !phno2 || !password) {
@@ -119,10 +92,13 @@ function registerUser()
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            dept: dept,
+            dept_name: dept_name,
+            dept_id: dept_id,
+            hod_name: hod_name,
+            tech_name: tech_name,
             email: email,
-            phno2: phno2,
-            phno1: phno1, 
+            tech_phno: tech_phno,
+            hod_phno: hod_phno, 
             password: password
         })
     })
@@ -140,8 +116,8 @@ function registerUser()
 
 async function loginUser() {
     const data = {
-        dept: document.getElementById("dept").value,
-        phno2: document.getElementById("phno2").value,
+        dept_id: document.getElementById("dept_id").value,
+        tech_phno: document.getElementById("tech_phno").value,
         password: document.getElementById("password").value
     }
 
@@ -182,23 +158,36 @@ document.getElementById("special").style.color =
 
 
 function toggleMenu(){
-
    let sidebar = document.getElementById("sidebar");
    sidebar.classList.toggle("active");
-
 }
 
-document.querySelector('.category-header').addEventListener('click', function() {
-    this.parentElement.classList.toggle('active');
+// document.querySelector('.category-header').addEventListener('click', function() {
+//     this.parentElement.classList.toggle('active');
     
-    // Toggle showing/hiding the submenu
-    const submenu = this.nextElementSibling;
-    if (submenu.style.display === "block") {
-        submenu.style.display = "none";
-    } else {
-        submenu.style.display = "block";
-    }
-});
+//     // Toggle showing/hiding the submenu
+//     const submenu = this.nextElementSibling;
+//     if (submenu.style.display === "block") {
+//         submenu.style.display = "none";
+//     } else {
+//         submenu.style.display = "block";
+//     }
+// });
+
+// const categoryHeader = document.querySelector('.category-header')
+// if(categoryHeader) {
+//     categoryHeader.addEventListener('click', function() {
+//         this.parentElement.classList.toggle('active')
+
+//         const submenu = this.nextElementSibling
+//         if(submenu.style.display === "block") {
+//             submenu.style.display = "none"
+//         }
+//         else {
+//             submenu.style.display = "block"
+//         }
+//     })
+// }
 
 function handleMultipleUpload(event) {
     const files = event.target.files;
@@ -316,13 +305,6 @@ async function addData() {
 
     }
 }
-
-
-  
-
-
-
-
 
 function loadFaculty() {
     console.log("Loading...");

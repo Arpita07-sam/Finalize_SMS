@@ -4,15 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
+    <style>
+body{
+font-family: Arial;
+text-align:center;
+margin-top:40px;
+}
+
+.progress-box{
+width:300px;
+height:25px;
+border:1px solid black;
+margin:auto;
+margin-top:20px;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:green;
+color:white;
+}
+
+.gallery{
+margin-top:30px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:20px;
+}
+
+.gallery img{
+height:120px;
+border:1px solid gray;
+padding:5px;
+}
+
+.progress-container{
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 25px;
+}
+
+#progress-bar{
+  height: 100%;
+  width: 0%;
+  background-color: #4CAF50;
+  text-align: center;
+  line-height: 25px;
+  color: white;
+  font-weight: bold;
+}
+
+</style>
 </head>
 <body>
     {% extends "pages/block.html" %}
-    {% block content %}
-        <h3>Settings</h3>
+    {%  block content %}
+    <div class="container">
+        <h2>Signature Settings</h2>
+        <div id="upload-section">
+            <h3>Upload Signature Page</h3>
+            <!-- <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <input type="hidden" name="dept_id" value="101">
+                <button type="submit" onclick="submitBtn()">Process & Crop</button>
+            </form> -->
+
+            <input type="text" id="dept_id" placeholder="Department ID">
+            <br><br>
+            <input type="file" id="files" multiple>
+            <br><br>
+            <button onclick="uploadFiles()">Process</button>
+            <div class="progress-box">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="gallery" id="gallery"></div>
+        </div>
+
+    </div>
     {% endblock %}
     
+<script>
+
+function updateProgress(percent){
+    const bar = document.getElementById("progress-bar");
+    bar.style.width = percent + "%";
+    bar.innerHTML = percent + "%";
+}
+
+// example simulation
+let i = 0;
+let interval = setInterval(()=>{
+    if(i>=100) clearInterval(interval);
+    updateProgress(i);
+    i+=5;
+},500);
 
 
-    <script src="script.js"></script>
+function uploadFiles(){
+
+let files = document.getElementById("files").files
+
+let dept_id = document.getElementById("dept_id").value
+
+let formData = new FormData()
+
+for(let i=0;i<files.length;i++){
+
+formData.append("files", files[i])
+
+}
+
+formData.append("dept_id", dept_id)
+
+
+
+let xhr = new XMLHttpRequest()
+
+xhr.open("POST","/upload",true)
+
+
+
+xhr.upload.onprogress = function(e){
+
+if(e.lengthComputable){
+
+let percent = Math.round((e.loaded/e.total)*100)
+
+let bar = document.getElementById("progressBar")
+
+bar.style.width = percent + "%"
+
+bar.innerHTML = percent + "%"
+
+}
+
+}
+xhr.onload = function(){
+
+let response = JSON.parse(xhr.responseText)
+
+showImages(response.images)
+
+}
+xhr.send(formData)
+
+}
+function showImages(images){
+
+let gallery = document.getElementById("gallery")
+
+gallery.innerHTML = ""
+
+for(let i=0;i<images.length;i++){
+
+let img = document.createElement("img")
+
+img.src = images[i]
+
+gallery.appendChild(img)
+
+}
+
+}
+
+
+
+
+
+</script>    
 </body>
 </html>

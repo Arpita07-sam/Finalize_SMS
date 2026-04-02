@@ -16,30 +16,37 @@
         <form action="/register" method="POST">
             <form>
                 <label>Department</label>
-                <input type="text" id="dept" name="dept" placeholder="Enter Department">
+                <input type="text" id="dept_name" name="dept_name" placeholder="Enter Department">
+
+                <label>Department ID</label>
+                <input type="text" id="dept_id" name="dept_id" placeholder="Enter Department ID">
+
+                <label>HOD name</label>
+                <input type="text" id="hod_name" name="hod_name" placeholder="Enter HOD name">
+
+                <label>Technician name</label>
+                <input type="text" id="tech_name" name="tech_name" placeholder="Enter Technician name">
+
+                <label>Phone number(Techinican)</label>
+                <input type="text" id="tech_phno" name="tech_phno" placeholder="Enter Phone number(Techinican)">
+
+                <label>Phone number(HOD)</label>
+                <input type="text" id="hod_phno" name="hod_phno" placeholder="Enter Phone number(HOD)"> 
 
                 <label>Email ID(HOD)</label>
-                <input type="email" id="email" name="email" placeholder="Enter Email ID">
+                <input type="email" id="email" name="email" placeholder="Enter Email ID(HOD)">
 
-                <label class="small-label">Phone number(Techinican)</label>
-                <input type="text" id="phno2" name="phno2" placeholder="Enter Phone number(Techinican)">
-
-                <div class="verification-section">
-                    <div class="verification-inputs">
-                        <label class="small-label">Phone number(HOD)</label>
-                        <input type="text" id="phno1" name="phno1" placeholder="Enter Phone number(HOD)"> 
-                       
-                        <label class="small-label">Enter Verification Code</label>
-                        <input type="password" id="otpInput" placeholder="Enter verification code">
-                    </div>
-
-                    <div class="verification-buttons">
-                        <button class="opt-btn" onclick="sendCode()">Send Verification Code</button>
-                        <button class="opt-btn" onclick="verifyCode()">Verify</button>
-                    </div>
-
+                <button onclick="sendCode()">Send Verification Code to Mail ID</button>
+                
+                <label>Enter Verification Code</label>
+                <div style="display:flex; align-items:center; gap:1px;">
+                    <span id="timerText" style="font-size:12px; color:gray;"></span>                   
+                    <input type="password" id="otpInput" placeholder="Enter verification code">
                 </div>
 
+                <button id="verifyBtn" onclick="verifyCode()" style="width:220px;">Verify</button> 
+                <button id="resendBtn" onclick="sendCode()" disabled style="margin-left:1px; width:220px;">Resend</button>
+                
                 <label>Set a Password</label>
 
                 <div class="password-box">
@@ -50,11 +57,133 @@
                     </form>
                 </div>
                 <button onclick="registerUser()">Register and Login</button>
-
             </form>
         </form>
-
     </div>
+<script>
+let timer;
+let timeLeft = 60;
+// SEND CODE
+function sendCode() {
+    let email = document.getElementById("email").value;
+    fetch("/send-code", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({email: email})
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        if(data.message.toLowerCase().includes("sent")) {
+            startTimer();
+            document.getElementById("verifyBtn").disabled = false;
+        }
+    });
+}
+// VERIFY CODE
+function verifyCode() {
+    let email = document.getElementById("email").value;
+    let code = document.getElementById("otpInput").value;
+    fetch("/verify-code", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            code: code
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        clearInterval(timer);
+        document.getElementById("timerText").textContent = "";
+    });
+}
+// TIMER FUNCTION
+function startTimer() {
+    const resendBtn = document.getElementById("resendBtn");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const timerText = document.getElementById("timerText");
+    clearInterval(timer);
+    timeLeft = 60;
+    resendBtn.disabled = true;
+    verifyBtn.disabled = false;
+    timer = setInterval(() => {
+        timerText.textContent = `(${timeLeft}s)`;
+        timeLeft--;
+        if(timeLeft < 0) {
+            clearInterval(timer);
+            timerText.textContent = "";
+            verifyBtn.disabled = true;   // disable verify
+            resendBtn.disabled = false;  // enable resend
+        }
+    }, 1000);
+}
+
+// let timeLeft = 60;
+// let timer;
+
+// function startTimer() {
+//     const resendBtn = document.getElementById("resendBtn");
+//     const timerText = document.getElementById("timerText");
+//     resendBtn.disabled = true;
+//     timeLeft = 60;
+//     clearInterval(timer);
+//     timer = setInterval(() => {
+//         resendBtn.textContent = `Resend Code (${timeLeft}s)`;
+//         timerText.textContent = `You can resend code in ${timeLeft} seconds`;
+//         timeLeft--;
+//         if(timeLeft < 0) {
+//             clearInterval(timer);
+//             resendBtn.disabled = false;
+//             resendBtn.textContent = "Resend Code";
+//             timerText.textContent = "";
+//         }
+//     }, 1000);
+// }
+
+// function sendCode()
+// {
+//     let email = document.getElementById("email").value;
+//     fetch("/send-code", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({email: email})
+//     })
+//     .then(res => res.json())
+//     .then(data =>  { 
+//         alert(data.message);
+//         if(data.message.toLowerCase().includes("sent")) {
+//             startTimer();
+//         }
+//     });
+// }
+
+// function verifyCode()
+// {
+//     let email = document.getElementById("email").value;
+//     let code = document.getElementById("otpInput").value;
+//     fetch("/verify-code", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({
+//             email: email,
+//             code: code
+//         })
+//     })
+//     .then(res => res.json())
+//     .then(data => alert(data.message));
+// }
+
+</script>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
     

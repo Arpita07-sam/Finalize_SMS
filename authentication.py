@@ -16,9 +16,9 @@ def generate_password(length=8):
 def send_verification_code(receiver_email):
 
     # email details
-    sender_email = "arpita.sam2k4@gmail.com"
+    sender_email = "dept.notification.bot@gmail.com"
     # receiver_email = "user_email@gmail.com"
-    app_password = "anec ysmw optz dlby"   # gmail app password
+    app_password = "sayk yevv niax ilus"   # gmail app password
 
     # generate random password
     new_password = generate_password()
